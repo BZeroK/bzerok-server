@@ -2,3 +2,4 @@
 .idea/
 build/
 application.properties
+application-oauth.properties
