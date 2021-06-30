@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.bzerok.server.domain.login.GoogleLogin;
 import com.bzerok.server.domain.login.SocialLogin;
 import com.bzerok.server.domain.login.SocialLoginType;
 import lombok.RequiredArgsConstructor;
