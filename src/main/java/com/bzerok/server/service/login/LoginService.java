@@ -38,7 +38,7 @@ public class LoginService {
         return socialLoginList.stream()
                 .filter(x -> x.type() == socialLoginType)
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 SocialLoginType 입니다."));
+                .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 소셜 로그인 방법입니다."));
     }
 
 }
