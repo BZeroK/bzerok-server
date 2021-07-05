@@ -39,9 +39,9 @@ public class LiquorPostService {
         else return new LiquorResponseDto(liquor);
     }
 
-//    @Transactional
-//    public Long delete(Long liquorPostId) {
-//
-//    }
+    @Transactional
+    public void delete(Long liquorPostId) {
+        liquorRepository.deleteById(liquorPostId);
+    }
 
 }

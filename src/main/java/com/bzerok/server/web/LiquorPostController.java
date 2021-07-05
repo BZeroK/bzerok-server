@@ -16,19 +16,18 @@ public class LiquorPostController {
 
     @PostMapping("/api/v1/liquor")
     public String save(@RequestBody LiquorSaveRequestDto requestDto) {
-
         Long result = liquorPostService.save(requestDto);
         JsonObject response = new JsonObject();
 
         if (result != null) {
             response.addProperty("code", 200);
-            response.addProperty("data", "");
             response.addProperty("message", "등록 성공");
+            response.addProperty("data", "");
         }
         else {
             response.addProperty("code", 500);
-            response.addProperty("data", "");
             response.addProperty("message", "등록 실패");
+            response.addProperty("data", "");
         }
 
         return response.toString();
@@ -41,14 +40,26 @@ public class LiquorPostController {
 
         if (result != null) {
             response.addProperty("code", 200);
-            response.addProperty("data", "");
             response.addProperty("message", "수정 성공");
+            response.addProperty("data", "");
         }
         else {
             response.addProperty("code", 500);
-            response.addProperty("data", "");
             response.addProperty("message", "수정 실패");
+            response.addProperty("data", "");
         }
+
+        return response.toString();
+    }
+
+    @DeleteMapping("/api/v1/liquor/{liquorPostId}")
+    public String delete(@PathVariable Long liquorPostId) {
+        liquorPostService.delete(liquorPostId);
+        JsonObject response = new JsonObject();
+
+        response.addProperty("code", 200);
+        response.addProperty("message", "삭제 성공");
+        response.addProperty("data", "");
 
         return response.toString();
     }
@@ -57,28 +68,31 @@ public class LiquorPostController {
     public String findById(@PathVariable Long userId) {
         LiquorResponseDto result = liquorPostService.findByUserId(userId);
         JsonObject response = new JsonObject();
+        JsonObject data = new JsonObject();
 
         if (result != null) {
+            data.addProperty("liquorPostId", result.getLiquorPostId());
+            data.addProperty("userId", result.getUserId());
+            data.addProperty("name", result.getName());
+            data.addProperty("category", result.getCategory());
+            data.addProperty("volume", result.getVolume());
+            data.addProperty("price", result.getPrice());
+            data.addProperty("rate", result.getRate());
+            data.addProperty("picture", result.getPicture());
+            data.addProperty("etc", result.getEtc());
+
             response.addProperty("code", 200);
-            response.addProperty("data", result.toString());
             response.addProperty("message", "조회 성공");
+            response.add("data", data);
         }
         else {
             response.addProperty("code", 500);
+            response.addProperty("message", "해당 사용자의 게시물이 존재하지 않습니다. userId=" + userId);
             response.addProperty("data", "");
-            response.addProperty("message", "게시물이 존재하지 않습니다. liquor_post_id = " + userId);
         }
 
         return response.toString();
     }
-
-//    @DeleteMapping("/api/v1/liquor/{liquorPostId}")
-//    public String delete(@PathVariable Long liquorPostId) {
-//        Long result = liquorPostService.delete(liquorPostId);
-//
-//        if (result != null) return responseBuilder.build(200, "", "삭제 성공");
-//        else return responseBuilder.build(500, "", "게시물이 존재하지 않습니다. liquor_post_id = " + liquorPostId);
-//    }
 
 
 }
