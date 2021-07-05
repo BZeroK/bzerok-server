@@ -4,7 +4,6 @@ import javax.transaction.Transactional;
 
 import com.bzerok.server.domain.liquor.Liquor;
 import com.bzerok.server.domain.liquor.LiquorRepository;
-//import com.bzerok.server.domain.liquorCategories.LiquorCategoriesRepository;
 import com.bzerok.server.web.dto.LiquorResponseDto;
 import com.bzerok.server.web.dto.LiquorSaveRequestDto;
 import com.bzerok.server.web.dto.LiquorUpdateRequestDto;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 public class LiquorPostService {
 
     private final LiquorRepository liquorRepository;
-//    private final LiquorCategoriesRepository liquorCategoriesRepository;
 
     @Transactional
     public Long save(LiquorSaveRequestDto requestDto) {
@@ -32,16 +30,16 @@ public class LiquorPostService {
     }
 
     @Transactional
+    public void delete(Long liquorPostId) {
+        liquorRepository.deleteById(liquorPostId);
+    }
+
+    @Transactional
     public LiquorResponseDto findByUserId(Long userId) {
         Liquor liquor = liquorRepository.findByUserId(userId);
 
         if (liquor == null) return null;
         else return new LiquorResponseDto(liquor);
-    }
-
-    @Transactional
-    public void delete(Long liquorPostId) {
-        liquorRepository.deleteById(liquorPostId);
     }
 
 }
