@@ -1,14 +1,17 @@
 package com.bzerok.server.service.login;
 
-import java.io.IOException;
 import java.util.List;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 
 import com.bzerok.server.domain.login.SocialLogin;
 import com.bzerok.server.domain.login.SocialLoginType;
+import com.bzerok.server.domain.users.Users;
 import com.bzerok.server.domain.users.UsersRepository;
 import com.bzerok.server.web.dto.UserInfoDto;
+import com.bzerok.server.web.dto.UserTokenDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,27 +32,38 @@ public class LoginService {
         return socialLogin.getRedirectURL();
     }
 
-    public void requestAccessToken(SocialLoginType socialLoginType, String code) {
+    @Transactional
+    public Long requestAccessToken(SocialLoginType socialLoginType, String code) {
         SocialLogin socialLogin = this.findSocialLoginByType(socialLoginType);
         String tokenResponse = socialLogin.requestAccessToken(code);
 
-        log.info(">> Token 정보 :: {}", tokenResponse);
-
         try {
-            UserInfoDto userInfoDto = objectMapper.readValue(tokenResponse, UserInfoDto.class);
+            UserTokenDto userTokenDto = objectMapper.readValue(tokenResponse, UserTokenDto.class);
+            UserInfoDto userInfoDto = objectMapper.readValue(socialLogin.requestUserInfo(userTokenDto.getId_token()), UserInfoDto.class);
 
-            log.info(">> Token 정보 :: {}", userInfoDto.getAccess_token());
-            log.info(">> Token 정보 :: {}", userInfoDto.getId_token());
-            log.info(">> Token 정보 :: {}", userInfoDto.getScope());
-            log.info(">> Token 정보 :: {}", userInfoDto.getExpires_in());
-            log.info(">> Token 정보 :: {}", userInfoDto.getToken_type());
+            Users users = usersRepository.findByEmail(userInfoDto.getEmail());
 
+            if (users == null) {
+                usersRepository.save(
+                        Users.builder()
+                        .email(userInfoDto.getEmail())
+                        .name(userInfoDto.getName())
+                        .token(userTokenDto.getAccess_token())
+                        .idToken(userTokenDto.getId_token())
+                        .build()
+                        );
 
+                users = usersRepository.findByEmail(userInfoDto.getEmail());
+            }
+            else {
+                users.update(userTokenDto.getAccess_token(), userTokenDto.getId_token());
+            }
 
-            response.sendRedirect("http://localhost:3000/");
+            return users.getUserId();
         }
         catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
     }
 

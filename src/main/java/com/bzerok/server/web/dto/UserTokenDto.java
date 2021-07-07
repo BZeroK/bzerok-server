@@ -5,13 +5,9 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class UserInfoDto {
+public class UserTokenDto {
 
-    private String email;
-    private String name;
     private String access_token;
     private String id_token;
-
-
 
 }

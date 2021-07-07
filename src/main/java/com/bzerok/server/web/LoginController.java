@@ -1,5 +1,10 @@
 package com.bzerok.server.web;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import com.bzerok.server.domain.login.SocialLoginType;
 import com.bzerok.server.service.login.LoginService;
 import com.google.gson.JsonObject;
@@ -30,9 +35,14 @@ public class LoginController {
     }
 
     @GetMapping("/api/v1/{socialLoginType}/callback")
-    public void callback(@PathVariable String socialLoginType, @RequestParam String code) {
+    public void callback(HttpServletRequest request, HttpServletResponse response, @PathVariable String socialLoginType, @RequestParam String code) throws Exception {
         log.info(">> 소셜 로그인 API 서버로부터 받은 code :: {}", code);
-        loginService.requestAccessToken(SocialLoginType.valueOf(socialLoginType.toUpperCase()), code);
+        Long userId = loginService.requestAccessToken(SocialLoginType.valueOf(socialLoginType.toUpperCase()), code);
+
+        if (userId != null) {
+            request.getSession().setAttribute("userId", userId);
+            response.sendRedirect("http://localhost:3000/");
+        }
     }
 
 }

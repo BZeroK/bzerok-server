@@ -24,13 +24,25 @@ public class Users extends BaseTimeEntity {
     private String email;
 
     @Column
+    private String name;
+
+    @Column
     private String token;
 
+    @Column
+    private String idToken;
+
     @Builder
-    public Users (String email, String token) {
+    public Users (String email, String name, String token, String idToken) {
         this.email = email;
+        this.name = name;
         this.token = token;
+        this.idToken = idToken;
     }
 
+    public void update(String token, String idToken) {
+        this.token = token;
+        this.idToken = idToken;
+    }
 
 }
