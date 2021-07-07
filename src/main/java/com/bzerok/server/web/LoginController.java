@@ -1,8 +1,8 @@
 package com.bzerok.server.web;
 
-import com.bzerok.server.domain.login.SocialLogin;
 import com.bzerok.server.domain.login.SocialLoginType;
 import com.bzerok.server.service.login.LoginService;
+import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,15 +16,23 @@ public class LoginController {
     private final LoginService loginService;
 
     @GetMapping("/api/v1/login/{socialLoginType}")
-    public void redirectLoginRequest(@PathVariable String socialLoginType) {
+    public String redirectLoginRequest(@PathVariable String socialLoginType) {
         log.info(">> 사용자로부터 SNS 로그인 요청을 받음 :: {} Social Login", socialLoginType);
-        loginService.redirectLoginRequest(SocialLoginType.valueOf(socialLoginType.toUpperCase()));
+
+        String redirectURL = loginService.redirectLoginRequest(SocialLoginType.valueOf(socialLoginType.toUpperCase()));
+        JsonObject response = new JsonObject();
+
+        response.addProperty("code", 200);
+        response.addProperty("message", socialLoginType + " Redirect URL");
+        response.addProperty("data", redirectURL);
+
+        return response.toString();
     }
 
     @GetMapping("/api/v1/{socialLoginType}/callback")
-    public String callback(@PathVariable String socialLoginType, @RequestParam String code) {
+    public void callback(@PathVariable String socialLoginType, @RequestParam String code) {
         log.info(">> 소셜 로그인 API 서버로부터 받은 code :: {}", code);
-        return loginService.requestAccessToken(SocialLoginType.valueOf(socialLoginType.toUpperCase()), code);
+        loginService.requestAccessToken(SocialLoginType.valueOf(socialLoginType.toUpperCase()), code);
     }
 
 }

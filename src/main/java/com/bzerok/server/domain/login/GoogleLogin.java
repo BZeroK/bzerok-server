@@ -55,8 +55,8 @@ public class GoogleLogin implements SocialLogin {
 
         if (responseEntity.getStatusCode() == HttpStatus.OK)
             return responseEntity.getBody();
-
-        return "구글 로그인 요청 처리 실패";
+        else
+            return null;
     }
 
 }
