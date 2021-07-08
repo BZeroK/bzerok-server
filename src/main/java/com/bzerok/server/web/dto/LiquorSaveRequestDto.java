@@ -43,4 +43,8 @@ public class LiquorSaveRequestDto {
                 .build();
     }
 
+    public void setUserIdFromSession(Long userId) {
+        this.userId = userId;
+    }
+
 }

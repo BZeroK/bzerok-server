@@ -1,9 +1,14 @@
 package com.bzerok.server.web;
 
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import com.bzerok.server.service.liquor.LiquorPostService;
 import com.bzerok.server.web.dto.LiquorResponseDto;
 import com.bzerok.server.web.dto.LiquorSaveRequestDto;
 import com.bzerok.server.web.dto.LiquorUpdateRequestDto;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +20,9 @@ public class LiquorPostController {
     private final LiquorPostService liquorPostService;
 
     @PostMapping("/api/v1/liquor")
-    public String save(@RequestBody LiquorSaveRequestDto requestDto) {
-        Long result = liquorPostService.save(requestDto);
+    public String save(HttpServletRequest request, @RequestBody LiquorSaveRequestDto requestDto) {
+        Long userId = (Long) request.getSession().getAttribute("userId");
+        Long result = liquorPostService.save(userId, requestDto);
         JsonObject response = new JsonObject();
 
         if (result != null) {
@@ -64,22 +70,28 @@ public class LiquorPostController {
         return response.toString();
     }
 
-    @GetMapping("/api/v1/liquor/{userId}")
-    public String findById(@PathVariable Long userId) {
-        LiquorResponseDto result = liquorPostService.findByUserId(userId);
+    @GetMapping("/api/v1/liquor")
+    public String findById(HttpServletRequest request) {
+        Long userId = (Long) request.getSession().getAttribute("userId");
+        List<LiquorResponseDto> results = liquorPostService.findByUserId(userId);
         JsonObject response = new JsonObject();
-        JsonObject data = new JsonObject();
+        JsonArray data = new JsonArray();
 
-        if (result != null) {
-            data.addProperty("liquorPostId", result.getLiquorPostId());
-            data.addProperty("userId", result.getUserId());
-            data.addProperty("name", result.getName());
-            data.addProperty("category", result.getCategory());
-            data.addProperty("volume", result.getVolume());
-            data.addProperty("price", result.getPrice());
-            data.addProperty("rate", result.getRate());
-            data.addProperty("picture", result.getPicture());
-            data.addProperty("etc", result.getEtc());
+        if (results != null) {
+            for (LiquorResponseDto result : results) {
+                JsonObject temp = new JsonObject();
+                temp.addProperty("liquorPostId", result.getLiquorPostId());
+                temp.addProperty("userId", result.getUserId());
+                temp.addProperty("name", result.getName());
+                temp.addProperty("category", result.getCategory());
+                temp.addProperty("volume", result.getVolume());
+                temp.addProperty("price", result.getPrice());
+                temp.addProperty("rate", result.getRate());
+                temp.addProperty("picture", result.getPicture());
+                temp.addProperty("etc", result.getEtc());
+
+                data.add(temp);
+            }
 
             response.addProperty("code", 200);
             response.addProperty("message", "조회 성공");

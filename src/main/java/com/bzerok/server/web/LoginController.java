@@ -1,9 +1,7 @@
 package com.bzerok.server.web;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import com.bzerok.server.domain.login.SocialLoginType;
 import com.bzerok.server.service.login.LoginService;
