@@ -1,5 +1,8 @@
 package com.bzerok.server.service.liquor;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.transaction.Transactional;
 
 import com.bzerok.server.domain.liquor.Liquor;
@@ -17,7 +20,8 @@ public class LiquorPostService {
     private final LiquorRepository liquorRepository;
 
     @Transactional
-    public Long save(LiquorSaveRequestDto requestDto) {
+    public Long save(Long userId, LiquorSaveRequestDto requestDto) {
+        requestDto.setUserIdFromSession(userId);
         return liquorRepository.save(requestDto.toEntity()).getLiquorPostId();
     }
 
@@ -35,11 +39,10 @@ public class LiquorPostService {
     }
 
     @Transactional
-    public LiquorResponseDto findByUserId(Long userId) {
-        Liquor liquor = liquorRepository.findByUserId(userId);
-
-        if (liquor == null) return null;
-        else return new LiquorResponseDto(liquor);
+    public List<LiquorResponseDto> findByUserId(Long userId) {
+        return liquorRepository.findByUserId(userId).stream()
+                .map(LiquorResponseDto::new)
+                .collect(Collectors.toList());
     }
 
 }

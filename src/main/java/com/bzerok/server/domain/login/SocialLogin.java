@@ -5,6 +5,8 @@ public interface SocialLogin {
 
     String requestAccessToken(String code);
 
+    String requestUserInfo(String idToken);
+
     default SocialLoginType type() {
         if (this instanceof GoogleLogin) return SocialLoginType.GOOGLE;
         else return null;

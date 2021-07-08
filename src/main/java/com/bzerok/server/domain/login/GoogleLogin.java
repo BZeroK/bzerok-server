@@ -55,8 +55,19 @@ public class GoogleLogin implements SocialLogin {
 
         if (responseEntity.getStatusCode() == HttpStatus.OK)
             return responseEntity.getBody();
+        else
+            return null;
+    }
 
-        return "구글 로그인 요청 처리 실패";
+    @Override
+    public String requestUserInfo(String idToken) {
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> responseEntity = restTemplate.getForEntity("https://oauth2.googleapis.com/tokeninfo?id_token=" + idToken, String.class);
+
+        if (responseEntity.getStatusCode() == HttpStatus.OK)
+            return responseEntity.getBody();
+        else
+            return null;
     }
 
 }
