@@ -18,14 +18,14 @@ public class LiquorUpdateRequestDto {
     private String etc;
 
     @Builder
-    public LiquorUpdateRequestDto(Liquor entity) {
-        this.name = entity.getName();
-        this.category = entity.getCategory();
-        this.volume = entity.getVolume();
-        this.price = entity.getPrice();
-        this.rate = entity.getRate();
-        this.picture = entity.getPicture();
-        this.etc = entity.getEtc();
+    public LiquorUpdateRequestDto(String name, Integer category, Integer volume, Integer price, Integer rate, String picture, String etc) {
+        this.name = name;
+        this.category = category;
+        this.volume = volume;
+        this.price = price;
+        this.rate = rate;
+        this.picture = picture;
+        this.etc = etc;
     }
 
     public Liquor toEntity() {
