@@ -19,15 +19,15 @@ public class LiquorSaveRequestDto {
     private String etc;
 
     @Builder
-    public LiquorSaveRequestDto(Liquor entity) {
-        this.userId = entity.getUserId();
-        this.name = entity.getName();
-        this.category = entity.getCategory();
-        this.volume = entity.getVolume();
-        this.price = entity.getPrice();
-        this.rate = entity.getRate();
-        this.picture = entity.getPicture();
-        this.etc = entity.getEtc();
+    public LiquorSaveRequestDto(Long userId, String name, Integer category, Integer volume, Integer price, Integer rate, String picture, String etc) {
+        this.userId = userId;
+        this.name = name;
+        this.category = category;
+        this.volume = volume;
+        this.price = price;
+        this.rate = rate;
+        this.picture = picture;
+        this.etc = etc;
     }
 
     public Liquor toEntity() {
