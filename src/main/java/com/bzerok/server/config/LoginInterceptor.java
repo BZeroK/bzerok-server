@@ -19,7 +19,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         }
 
         Long userId = (Long) request.getSession().getAttribute("userId");
-        log.info("userId :: {}", userId);
+        log.info(">> userId :: {}", userId);
 
         if (userId == null) {
             JsonObject res = new JsonObject();
@@ -29,6 +29,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             response.setContentType(request.getContentType());
             response.setHeader("Access-Control-Allow-Origin", "*");
             response.getWriter().append(res.toString());
+
             return false;
         }
         else {

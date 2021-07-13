@@ -36,11 +36,26 @@ public class LoginController {
     public void callback(HttpServletRequest request, HttpServletResponse response, @PathVariable String socialLoginType, @RequestParam String code) throws Exception {
         log.info(">> 소셜 로그인 API 서버로부터 받은 code :: {}", code);
         Long userId = loginService.requestAccessToken(SocialLoginType.valueOf(socialLoginType.toUpperCase()), code);
+        JsonObject res = new JsonObject();
+
+        log.info("request :: {}", request.toString());
 
         if (userId != null) {
+            res.addProperty("code", 200);
+            res.addProperty("message", "로그인 성공");
+
             request.getSession().setAttribute("userId", userId);
-            response.sendRedirect("http://localhost:3000/");
+//            response.sendRedirect("http://localhost:3000/");
         }
+        else {
+            res.addProperty("code", 500);
+            res.addProperty("message", "서버 오류로 인한 로그인 실패");
+        }
+
+        response.setContentType("application/json;charset=UTF-8");
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.getWriter().append(res.toString());
+        response.sendRedirect("http://localhost:3000");
     }
 
 }
