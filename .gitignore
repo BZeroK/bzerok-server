@@ -3,3 +3,4 @@
 build/
 application.properties
 application-oauth.properties
+application.yml

@@ -24,7 +24,6 @@ public class LoginService {
 
     private final List<SocialLogin> socialLoginList;
     private final UsersRepository usersRepository;
-    private final HttpServletResponse response;
     private final ObjectMapper objectMapper;
 
     public String redirectLoginRequest(SocialLoginType socialLoginType) {
