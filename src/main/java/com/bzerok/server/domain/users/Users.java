@@ -29,7 +29,7 @@ public class Users extends BaseTimeEntity {
     @Column
     private String token;
 
-    @Column
+    @Column(columnDefinition = "LONGTEXT")
     private String idToken;
 
     @Builder
