@@ -13,15 +13,15 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class GoogleLogin implements SocialLogin {
 
-    @Value("${sns.google.url}")
+    @Value("${oauth.google.url}")
     private String GOOGLE_SNS_BASE_URL;
-    @Value("${sns.google.client.id}")
+    @Value("${oauth.google.client-id}")
     private String GOOGLE_SNS_CLIENT_ID;
-    @Value("${sns.google.callback.url}")
+    @Value("${oauth.google.callback-url}")
     private String GOOGLE_SNS_CALLBACK_URL;
-    @Value("${sns.google.client.secret}")
+    @Value("${oauth.google.client-secret}")
     private String GOOGLE_SNS_CLIENT_SECRET;
-    @Value("${sns.google.token.url}")
+    @Value("${oauth.google.token-url}")
     private String GOOGLE_SNS_TOKEN_BASE_URL;
 
     @Override

@@ -16,9 +16,15 @@ apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
-group 'com.ys.springboot'
+group 'com.bzerok.server'
 version '1.0-SNAPSHOT-' + new Date().format("yyyyMMddHHmmss")
 sourceCompatibility = 1.8
+
+configurations {
+    all {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
+}
 
 repositories {
     mavenCentral()
@@ -27,14 +33,18 @@ repositories {
 
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
-    compile('org.projectlombok:lombok')
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
-    compile('mysql:mysql-connector-java')
-    testCompile('org.springframework.boot:spring-boot-starter-test')
-    annotationProcessor('org.projectlombok:lombok')
+    compile('org.springframework.boot:spring-boot-starter-log4j2')
+    compile('org.projectlombok:lombok')
+    compile('com.h2database:h2')
     compile group: 'com.google.code.gson', name: 'gson', version: '2.8.2'
     compile('io.jsonwebtoken:jjwt-api:0.10.5')
+
+    annotationProcessor('org.projectlombok:lombok')
+
     runtime('io.jsonwebtoken:jjwt-impl:0.10.5')
     runtime('io.jsonwebtoken:jjwt-jackson:0.10.5')
+
+    testCompile('org.springframework.boot:spring-boot-starter-test')
     testAnnotationProcessor('org.projectlombok:lombok')
 }
