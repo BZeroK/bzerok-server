@@ -20,12 +20,12 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedHeaders("*");
     }
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        LoginInterceptor loginInterceptor = new LoginInterceptor();
-        registry.addInterceptor(loginInterceptor)
-                .addPathPatterns("/**")
-                .excludePathPatterns("/api/v1/login/**", "/api/v1/google/callback");
-    }
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        LoginInterceptor loginInterceptor = new LoginInterceptor();
+//        registry.addInterceptor(loginInterceptor)
+//                .addPathPatterns("/**")
+//                .excludePathPatterns("/api/v1/login/**", "/api/v1/google/callback");
+//    }
 
 }

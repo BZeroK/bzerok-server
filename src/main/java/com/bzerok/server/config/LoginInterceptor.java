@@ -19,6 +19,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         }
 
         Long userId = (Long) request.getSession().getAttribute("userId");
+        log.info(">> sessionId :: {}", request.getSession(false).getId());
         log.info(">> userId :: {}", userId);
 
         if (userId == null) {
