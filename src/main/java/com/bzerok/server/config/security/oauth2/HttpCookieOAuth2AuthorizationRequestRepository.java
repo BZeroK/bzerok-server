@@ -1,4 +1,4 @@
-package com.bzerok.server.config.security;
+package com.bzerok.server.config.security.oauth2;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,10 +20,6 @@ public class HttpCookieOAuth2AuthorizationRequestRepository implements Authoriza
 
     @Override
     public OAuth2AuthorizationRequest loadAuthorizationRequest(HttpServletRequest request) {
-        log.info(">> loadAuthorizationRequest :: {}", CookieUtils.getCookie(request, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME)
-                .map(cookie -> CookieUtils.deserialize(cookie, OAuth2AuthorizationRequest.class))
-                .orElse(null).getRedirectUri());
-
         return CookieUtils.getCookie(request, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME)
                 .map(cookie -> CookieUtils.deserialize(cookie, OAuth2AuthorizationRequest.class))
                 .orElse(null);
@@ -31,20 +27,13 @@ public class HttpCookieOAuth2AuthorizationRequestRepository implements Authoriza
 
     @Override
     public void saveAuthorizationRequest(OAuth2AuthorizationRequest authorizationRequest, HttpServletRequest request, HttpServletResponse response) {
-
-        log.info(">> saveAuthorizationRequest :: {}", CookieUtils.getCookie(request, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME)
-                .map(cookie -> CookieUtils.deserialize(cookie, OAuth2AuthorizationRequest.class))
-                .orElse(null));
-
         if (authorizationRequest == null) {
-            CookieUtils.deleteCookie(request, response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME);
-            CookieUtils.deleteCookie(request, response, REDIRECT_URI_COOKIE_NAME);
+            removeAuthorizationRequestCookies(request, response);
+            return;
         }
 
         CookieUtils.addCookie(response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME, CookieUtils.serialize(authorizationRequest), cookieExpireSeconds);
         String redirectUri = request.getParameter(REDIRECT_URI_COOKIE_NAME);
-
-        log.info(">> redirect URI :: {}", redirectUri);
 
         if (StringUtils.isNotBlank(redirectUri)) {
             CookieUtils.addCookie(response, REDIRECT_URI_COOKIE_NAME, redirectUri, cookieExpireSeconds);
@@ -53,10 +42,6 @@ public class HttpCookieOAuth2AuthorizationRequestRepository implements Authoriza
 
     @Override
     public OAuth2AuthorizationRequest removeAuthorizationRequest(HttpServletRequest request) {
-        log.info(">> removeAuthorizationRequest :: {}", CookieUtils.getCookie(request, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME)
-                .map(cookie -> CookieUtils.deserialize(cookie, OAuth2AuthorizationRequest.class))
-                .orElse(null));
-
         return this.loadAuthorizationRequest(request);
     }
 

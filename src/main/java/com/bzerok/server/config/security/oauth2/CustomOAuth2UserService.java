@@ -1,11 +1,11 @@
-package com.bzerok.server.config.security;
+package com.bzerok.server.config.security.oauth2;
 
 import java.util.Collections;
 
 import javax.servlet.http.HttpSession;
 
-import com.bzerok.server.config.security.dto.OAuthAttributes;
-import com.bzerok.server.config.security.dto.SessionUser;
+import com.bzerok.server.config.security.oauth2.dto.OAuthAttributes;
+import com.bzerok.server.config.security.oauth2.dto.SessionUser;
 import com.bzerok.server.domain.users.Users;
 import com.bzerok.server.domain.users.UsersRepository;
 import lombok.RequiredArgsConstructor;

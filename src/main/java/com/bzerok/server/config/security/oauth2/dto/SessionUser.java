@@ -1,4 +1,4 @@
-package com.bzerok.server.config.security.dto;
+package com.bzerok.server.config.security.oauth2.dto;
 
 import java.io.Serializable;
 
