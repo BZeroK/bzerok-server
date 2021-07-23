@@ -28,15 +28,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class TokenProvider implements InitializingBean {
 
-    private final Logger logger = LoggerFactory.getLogger(TokenProvider.class);
-
-    private static final String AUTHORITIES_KEY = "auth";
-
     @Value("${jwt.secret}")
     private String secret;
     @Value("${jwt.expiration}")
     private long expiration;
 
+    private final Logger logger = LoggerFactory.getLogger(TokenProvider.class);
+    private static final String AUTHORITIES_KEY = "auth";
     private Key key;
 
     @Override
@@ -46,14 +44,18 @@ public class TokenProvider implements InitializingBean {
     }
 
     public String createToken(Authentication authentication) {
-        logger.info(">> CREATE TOKEN :: authentication = {}", authentication);
-
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
         long now = (new Date()).getTime();
         Date validity = new Date(now + expiration);
+
+        logger.debug(">> JWT Info");
+        logger.debug("   -> subject = {}", authentication.getName());
+        logger.debug("   -> authorities = {}", authorities);
+        logger.debug("   -> key = {}", key);
+        logger.debug("   -> expiration = {}", validity);
 
         return Jwts.builder()
                 .setSubject(authentication.getName())
