@@ -5,22 +5,28 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.bzerok.server.utils.CookieUtils;
 import com.nimbusds.oauth2.sdk.util.StringUtils;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
 public class HttpCookieOAuth2AuthorizationRequestRepository implements AuthorizationRequestRepository<OAuth2AuthorizationRequest> {
 
-    public static final String OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME = "oauth2_auth_request";
-    public static final String REDIRECT_URI_COOKIE_NAME = "redirect_uri";
-    private static final int cookieExpireSeconds = 180;
+    @Value("${app.cookie.oauth2AuthorizationRequestName}")
+    private String OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME;
+    @Value("${app.cookie.redirectUriName}")
+    private String REDIRECT_URI_COOKIE_NAME;
+    @Value("${app.cookie.expireSeconds}")
+    private Integer COOKIE_EXPIRE_SECONDS;
+
+    private final Logger logger = LoggerFactory.getLogger(HttpCookieOAuth2AuthorizationRequestRepository.class);
 
     @Override
     public OAuth2AuthorizationRequest loadAuthorizationRequest(HttpServletRequest request) {
-        log.info(">> loadAuthorizationRequest");
+        logger.debug(">> loadAuthorizationRequest");
         return CookieUtils.getCookie(request, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME)
                 .map(cookie -> CookieUtils.deserialize(cookie, OAuth2AuthorizationRequest.class))
                 .orElse(null);
@@ -28,26 +34,24 @@ public class HttpCookieOAuth2AuthorizationRequestRepository implements Authoriza
 
     @Override
     public void saveAuthorizationRequest(OAuth2AuthorizationRequest authorizationRequest, HttpServletRequest request, HttpServletResponse response) {
-        log.info(">> saveAuthorizationRequest");
+        logger.debug(">> saveAuthorizationRequest");
 
         if (authorizationRequest == null) {
             removeAuthorizationRequestCookies(request, response);
             return;
         }
 
-        log.info(">> state :: {}", authorizationRequest);
-
-        CookieUtils.addCookie(response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME, CookieUtils.serialize(authorizationRequest), cookieExpireSeconds);
+        CookieUtils.addCookie(response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME, CookieUtils.serialize(authorizationRequest), COOKIE_EXPIRE_SECONDS);
         String redirectUri = request.getParameter(REDIRECT_URI_COOKIE_NAME);
 
         if (StringUtils.isNotBlank(redirectUri)) {
-            CookieUtils.addCookie(response, REDIRECT_URI_COOKIE_NAME, redirectUri, cookieExpireSeconds);
+            CookieUtils.addCookie(response, REDIRECT_URI_COOKIE_NAME, redirectUri, COOKIE_EXPIRE_SECONDS);
         }
     }
 
     @Override
     public OAuth2AuthorizationRequest removeAuthorizationRequest(HttpServletRequest request) {
-        log.info(">> removeAuthorizationRequest");
+        logger.debug(">> removeAuthorizationRequest");
         return this.loadAuthorizationRequest(request);
     }
 

@@ -9,7 +9,8 @@ import com.bzerok.server.config.security.oauth2.dto.SessionUser;
 import com.bzerok.server.domain.users.Users;
 import com.bzerok.server.domain.users.UsersRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -19,13 +20,13 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final UsersRepository usersRepository;
     private final HttpSession httpSession;
+    private final Logger logger = LoggerFactory.getLogger(CustomOAuth2UserService.class);
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -45,11 +46,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     public Users saveOrUpdate(OAuthAttributes attributes) {
-        log.info(">> attributes - email :: {}", attributes.getEmail());
-
         Users user = usersRepository.findByEmail(attributes.getEmail())
                 .map(entity -> entity.update(attributes.getName(), attributes.getPicture()))
                 .orElse(attributes.toEntity());
+
+        logger.info(">> user attributes - email :: {}", attributes.getEmail());
 
         return usersRepository.save(user);
     }

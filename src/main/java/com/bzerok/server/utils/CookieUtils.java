@@ -1,6 +1,8 @@
 package com.bzerok.server.utils;
 
-import lombok.extern.slf4j.Slf4j;
+import com.bzerok.server.config.security.jwt.JwtFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.SerializationUtils;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -8,15 +10,21 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Base64;
 import java.util.Optional;
 
-@Slf4j
 public class CookieUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(CookieUtils.class);
 
     public static Optional<Cookie> getCookie(HttpServletRequest request, String name) {
         Cookie[] cookies = request.getCookies();
 
+        logger.debug(">> cookie name : {}", name);
+
         if (cookies != null && cookies.length > 0) {
             for (Cookie cookie : cookies) {
+                logger.debug(">> cookie : {}", cookie.getName());
+                logger.debug(">> same : {}", cookie.getName().equals(name));
                 if (cookie.getName().equals(name)) {
+                    logger.debug(">> cookie : {}", cookie.getName());
                     return Optional.of(cookie);
                 }
             }

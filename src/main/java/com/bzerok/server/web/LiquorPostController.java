@@ -11,12 +11,10 @@ import com.bzerok.server.web.dto.LiquorUpdateRequestDto;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-@Slf4j
 @RequiredArgsConstructor
 @RestController
 public class LiquorPostController {
@@ -25,14 +23,6 @@ public class LiquorPostController {
 
     @PostMapping("/api/v1/liquor")
     public String save(HttpServletRequest request, @RequestBody LiquorSaveRequestDto requestDto) {
-
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserDetails userDetails = (UserDetails)principal;
-        String username = ((UserDetails) principal).getUsername();
-        String password = ((UserDetails) principal).getPassword();
-
-        log.info(username);
-        log.info(password);
         Long userId = (Long) request.getSession().getAttribute("userId");
         Long result = liquorPostService.save(userId, requestDto);
         JsonObject response = new JsonObject();

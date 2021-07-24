@@ -8,20 +8,23 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.bzerok.server.utils.CookieUtils;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import static com.bzerok.server.config.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_COOKIE_NAME;
-
-@Slf4j
 @RequiredArgsConstructor
 @Component
 public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
+    @Value("${app.cookie.redirectUriName}")
+    private String REDIRECT_URI_COOKIE_NAME;
+
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+    private final Logger logger = LoggerFactory.getLogger(OAuth2AuthenticationFailureHandler.class);
 
     @Override
     public void onAuthenticationFailure (HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, SecurityException {
@@ -35,7 +38,7 @@ public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationF
 
         httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
 
-        log.info(">> FAILURE!, Redirect URI :: {}", targetUrl);
+        logger.info(">> Authentication Failure!, Redirect URI :: {}", targetUrl);
 
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
