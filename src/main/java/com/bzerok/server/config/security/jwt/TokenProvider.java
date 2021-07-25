@@ -6,6 +6,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpSession;
+
+import com.bzerok.server.config.security.oauth2.dto.SessionUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -14,6 +17,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -25,6 +29,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
+@RequiredArgsConstructor
 @Component
 public class TokenProvider implements InitializingBean {
 
@@ -32,9 +37,11 @@ public class TokenProvider implements InitializingBean {
     private String secret;
     @Value("${jwt.expiration}")
     private long expiration;
+    @Value("${app.session.attributes.user}")
+    private String SESSION_USER;
 
+    private final HttpSession httpSession;
     private final Logger logger = LoggerFactory.getLogger(TokenProvider.class);
-    private static final String AUTHORITIES_KEY = "auth";
     private Key key;
 
     @Override
@@ -47,6 +54,11 @@ public class TokenProvider implements InitializingBean {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute(SESSION_USER);
+        Long userId = sessionUser.getUserId();
+
+        logger.info(">> authentication :: {}", authentication);
+        logger.info(">> authorities :: {}", authorities);
 
         long now = (new Date()).getTime();
         Date validity = new Date(now + expiration);
@@ -59,9 +71,10 @@ public class TokenProvider implements InitializingBean {
 
         return Jwts.builder()
                 .setSubject(authentication.getName())
-                .claim(AUTHORITIES_KEY, authorities)
-                .signWith(key, SignatureAlgorithm.HS512)
                 .setExpiration(validity)
+                .claim("role", authorities)
+                .claim("user_id", userId)
+                .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
 
@@ -74,7 +87,7 @@ public class TokenProvider implements InitializingBean {
                 .getBody();
 
         Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
+                Arrays.stream(claims.get("role").toString().split(","))
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 

@@ -2,8 +2,9 @@ package com.bzerok.server.web;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
+import com.bzerok.server.config.security.oauth2.dto.SessionUser;
 import com.bzerok.server.service.liquor.LiquorPostService;
 import com.bzerok.server.web.dto.LiquorResponseDto;
 import com.bzerok.server.web.dto.LiquorSaveRequestDto;
@@ -11,19 +12,26 @@ import com.bzerok.server.web.dto.LiquorUpdateRequestDto;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
 public class LiquorPostController {
 
+    @Value("${app.session.attributes.user}")
+    private String SESSION_USER;
+
     private final LiquorPostService liquorPostService;
+    private final HttpSession httpSession;
+    private final static Logger logger = LoggerFactory.getLogger(LiquorPostController.class);
 
     @PostMapping("/api/v1/liquor")
-    public String save(HttpServletRequest request, @RequestBody LiquorSaveRequestDto requestDto) {
-        Long userId = (Long) request.getSession().getAttribute("userId");
+    public String save(@RequestBody LiquorSaveRequestDto requestDto) {
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute(SESSION_USER);
+        Long userId = sessionUser.getUserId();
         Long result = liquorPostService.save(userId, requestDto);
         JsonObject response = new JsonObject();
 
@@ -73,8 +81,9 @@ public class LiquorPostController {
     }
 
     @GetMapping("/api/v1/liquor")
-    public String findById(HttpServletRequest request) {
-        Long userId = (Long) request.getSession().getAttribute("userId");
+    public String findById() {
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute(SESSION_USER);
+        Long userId = sessionUser.getUserId();
         List<LiquorResponseDto> results = liquorPostService.findByUserId(userId);
         JsonObject response = new JsonObject();
         JsonArray data = new JsonArray();

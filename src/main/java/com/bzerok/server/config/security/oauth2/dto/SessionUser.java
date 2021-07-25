@@ -8,12 +8,14 @@ import lombok.Getter;
 @Getter
 public class SessionUser implements Serializable {
 
+    private Long userId;
     private String name;
     private String email;
 
     public SessionUser(Users user) {
+        this.userId = user.getUserId();
         this.name = user.getName();
-        email = user.getEmail();
+        this.email = user.getEmail();
     }
 
 }

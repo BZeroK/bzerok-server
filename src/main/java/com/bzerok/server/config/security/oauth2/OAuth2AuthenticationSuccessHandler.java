@@ -9,6 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.bzerok.server.config.security.jwt.TokenProvider;
 import com.bzerok.server.utils.CookieUtils;
@@ -31,10 +32,12 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private String JWT_TOKEN_NAME;
     @Value("${app.cookie.redirectUriName}")
     private String REDIRECT_URI_COOKIE_NAME;
+    @Value("${app.session.attributes.user}")
+    private String SESSION_USER;
 
+    private final HttpSession httpSession;
     private final TokenProvider tokenProvider;
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
-
     private static final Logger logger = LoggerFactory.getLogger(OAuth2AuthenticationSuccessHandler.class);
 
     @Override
@@ -46,13 +49,12 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             return;
         }
 
-        logger.debug(">> Target URL :: {}", targetUrl);
-
         clearAuthenticationAttributes(request, response);
 
         String token = tokenProvider.createToken(authentication);
-
         CookieUtils.addCookie(response, JWT_TOKEN_NAME, token, 846000);
+
+        logger.debug(">> Redirect URI :: {}", targetUrl);
 
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
@@ -61,17 +63,12 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         Optional<String> redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_COOKIE_NAME)
                 .map(Cookie::getValue);
 
-        logger.debug(">> Redirect URI :: {}", redirectUri);
-        logger.debug(">> Authentication :: {}", authentication);
-
         if (redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get())) {
             logger.info(">> Sorry! We've got an Unauthorized Redirect URI and can't proceed with the authentication");
             return "";
         }
 
-        String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
-
-        return UriComponentsBuilder.fromUriString(targetUrl)
+        return UriComponentsBuilder.fromUriString(redirectUri.orElse(getDefaultTargetUrl()))
                 .build().toUriString();
     }
 
@@ -86,7 +83,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         return AUTHORIZED_REDIRECT_URIS
                 .stream()
                 .anyMatch(authorizedRedirectUri -> {
-                    // Only validate host and port. Let the clients use different paths if they want to
                     URI authorizedURI = URI.create(authorizedRedirectUri);
                     return authorizedURI.getHost().equalsIgnoreCase(clientRedirectUri.getHost())
                             && authorizedURI.getPort() == clientRedirectUri.getPort();

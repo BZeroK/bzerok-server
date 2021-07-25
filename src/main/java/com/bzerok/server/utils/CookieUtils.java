@@ -17,14 +17,9 @@ public class CookieUtils {
     public static Optional<Cookie> getCookie(HttpServletRequest request, String name) {
         Cookie[] cookies = request.getCookies();
 
-        logger.debug(">> cookie name : {}", name);
-
         if (cookies != null && cookies.length > 0) {
             for (Cookie cookie : cookies) {
-                logger.debug(">> cookie : {}", cookie.getName());
-                logger.debug(">> same : {}", cookie.getName().equals(name));
                 if (cookie.getName().equals(name)) {
-                    logger.debug(">> cookie : {}", cookie.getName());
                     return Optional.of(cookie);
                 }
             }
