@@ -3,8 +3,6 @@ package com.bzerok.server.service.liquor;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.transaction.Transactional;
-
 import com.bzerok.server.domain.liquor.Liquor;
 import com.bzerok.server.domain.liquor.LiquorRepository;
 import com.bzerok.server.web.dto.LiquorResponseDto;
@@ -12,6 +10,7 @@ import com.bzerok.server.web.dto.LiquorSaveRequestDto;
 import com.bzerok.server.web.dto.LiquorUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -38,7 +37,7 @@ public class LiquorPostService {
         liquorRepository.deleteById(liquorPostId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<LiquorResponseDto> findByUserId(Long userId) {
         return liquorRepository.findByUserId(userId).stream()
                 .map(LiquorResponseDto::new)

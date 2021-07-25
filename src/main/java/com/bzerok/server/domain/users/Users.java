@@ -2,6 +2,8 @@ package com.bzerok.server.domain.users;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -20,29 +22,36 @@ public class Users extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @Column
+    @Column(nullable = false)
     private String email;
 
-    @Column
+    @Column(nullable = false)
     private String name;
 
     @Column
-    private String token;
+    private String picture;
 
-    @Column(columnDefinition = "LONGTEXT")
-    private String idToken;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
     @Builder
-    public Users (String email, String name, String token, String idToken) {
+    public Users (String email, String name, String picture, Role role) {
         this.email = email;
         this.name = name;
-        this.token = token;
-        this.idToken = idToken;
+        this.picture = picture;
+        this.role = role;
     }
 
-    public void update(String token, String idToken) {
-        this.token = token;
-        this.idToken = idToken;
+    public Users update(String name, String picture) {
+        this.name = name;
+        this.picture = picture;
+
+        return this;
+    }
+
+    public String getRoleKey() {
+        return this.role.getKey();
     }
 
 }
