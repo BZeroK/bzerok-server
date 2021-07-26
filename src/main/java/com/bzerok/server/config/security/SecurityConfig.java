@@ -10,6 +10,7 @@ import com.bzerok.server.config.security.oauth2.OAuth2AuthenticationFailureHandl
 import com.bzerok.server.config.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.bzerok.server.domain.users.Role;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
