@@ -2,6 +2,7 @@ package com.bzerok.server.web;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.bzerok.server.config.security.oauth2.dto.SessionUser;
@@ -29,24 +30,32 @@ public class LiquorPostController {
     private final static Logger logger = LoggerFactory.getLogger(LiquorPostController.class);
 
     @PostMapping("/api/v1/liquor")
-    public String save(@RequestBody LiquorSaveRequestDto requestDto) {
+    public String save(HttpServletResponse response, @RequestBody LiquorSaveRequestDto requestDto) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute(SESSION_USER);
-        Long userId = sessionUser.getUserId();
-        Long result = liquorPostService.save(userId, requestDto);
-        JsonObject response = new JsonObject();
+        JsonObject jsonObject = new JsonObject();
 
-        if (result != null) {
-            response.addProperty("code", 200);
-            response.addProperty("message", "등록 성공");
-            response.addProperty("data", "");
+        if (sessionUser == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            jsonObject.addProperty("message", "사용 권한이 없습니다. 다시 로그인하세요.");
         }
+
         else {
-            response.addProperty("code", 500);
-            response.addProperty("message", "등록 실패");
-            response.addProperty("data", "");
+            Long userId = sessionUser.getUserId();
+            Long result = liquorPostService.save(userId, requestDto);
+
+            if (result != null) {
+                jsonObject.addProperty("code", 200);
+                jsonObject.addProperty("message", "등록 성공");
+                jsonObject.addProperty("data", "");
+            }
+            else {
+                jsonObject.addProperty("code", 500);
+                jsonObject.addProperty("message", "등록 실패");
+                jsonObject.addProperty("data", "");
+            }
         }
 
-        return response.toString();
+        return jsonObject.toString();
     }
 
     @PutMapping("/api/v1/liquor/{liquorPostId}")

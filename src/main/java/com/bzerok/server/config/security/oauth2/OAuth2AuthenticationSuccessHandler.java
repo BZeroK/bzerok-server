@@ -32,10 +32,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private String JWT_TOKEN_NAME;
     @Value("${app.cookie.redirectUriName}")
     private String REDIRECT_URI_COOKIE_NAME;
-    @Value("${app.session.attributes.user}")
-    private String SESSION_USER;
 
-    private final HttpSession httpSession;
     private final TokenProvider tokenProvider;
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
     private static final Logger logger = LoggerFactory.getLogger(OAuth2AuthenticationSuccessHandler.class);

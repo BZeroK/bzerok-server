@@ -1,6 +1,5 @@
 package com.bzerok.server.utils;
 
-import com.bzerok.server.config.security.jwt.JwtFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.SerializationUtils;
