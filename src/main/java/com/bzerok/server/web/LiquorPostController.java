@@ -5,9 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import com.bzerok.server.config.security.oauth2.dto.SessionUser;
 import com.bzerok.server.service.liquor.LiquorPostService;
 import com.bzerok.server.web.dto.LiquorResponseDto;
 import com.bzerok.server.web.dto.LiquorSaveRequestDto;
@@ -17,42 +15,30 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
 public class LiquorPostController {
 
-    @Value("${app.session.attributes.user}")
-    private String SESSION_USER;
-
     private final LiquorPostService liquorPostService;
-    private final HttpSession httpSession;
     private final static Logger logger = LoggerFactory.getLogger(LiquorPostController.class);
 
     @PostMapping("/api/v1/liquor")
     public String save(HttpServletResponse response, @RequestBody LiquorSaveRequestDto requestDto) throws JsonProcessingException {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute(SESSION_USER);
+        Long userId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
         Map<String, Object> jsonData = new HashMap<String, Object>();
 
-        if (sessionUser == null) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            jsonData.put("message", "사용 권한이 없습니다. 다시 로그인하세요.");
+        Long result = liquorPostService.save(userId, requestDto);
+
+        if (result != null) {
+            jsonData.put("code", 200);
+            jsonData.put("message", "등록 성공");
         }
-
         else {
-            Long userId = sessionUser.getUserId();
-            Long result = liquorPostService.save(userId, requestDto);
-
-            if (result != null) {
-                jsonData.put("code", 200);
-                jsonData.put("message", "등록 성공");
-            }
-            else {
-                jsonData.put("code", 500);
-                jsonData.put("message", "등록 실패");
-            }
+            jsonData.put("code", 500);
+            jsonData.put("message", "등록 실패");
         }
 
         return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(jsonData);
@@ -89,8 +75,7 @@ public class LiquorPostController {
 
     @GetMapping("/api/v1/liquor")
     public String findById() throws JsonProcessingException {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute(SESSION_USER);
-        Long userId = sessionUser.getUserId();
+        Long userId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
         List<LiquorResponseDto> results = liquorPostService.findByUserId(userId);
         Map<String, Object> jsonData = new HashMap<String, Object>();
 

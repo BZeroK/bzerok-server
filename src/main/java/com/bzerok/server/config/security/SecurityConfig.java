@@ -10,7 +10,6 @@ import com.bzerok.server.config.security.oauth2.OAuth2AuthenticationFailureHandl
 import com.bzerok.server.config.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.bzerok.server.domain.users.Role;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -55,8 +54,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/h2-console/**",
                             "/api/v1/oauth2/**"
                         ).permitAll()
-//                    .antMatchers("/api/v1/**")
-//                        .hasRole(Role.USER.name())
+                    .antMatchers("api/v1/admin/**")
+                        .hasRole(Role.ADMIN.name())
+                    .antMatchers("/api/v1/**")
+                        .hasRole(Role.USER.name())
                     .anyRequest()
                         .authenticated()
 
