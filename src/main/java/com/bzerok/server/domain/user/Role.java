@@ -1,4 +1,4 @@
-package com.bzerok.server.domain.users;
+package com.bzerok.server.domain.user;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

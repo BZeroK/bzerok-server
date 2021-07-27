@@ -2,8 +2,8 @@ package com.bzerok.server.config.security.oauth2.dto;
 
 import java.util.Map;
 
-import com.bzerok.server.domain.users.Role;
-import com.bzerok.server.domain.users.Users;
+import com.bzerok.server.domain.user.Role;
+import com.bzerok.server.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -55,8 +55,8 @@ public class OAuthAttributes {
 //        // TODO
 //    }
 
-    public Users toEntity() {
-        return Users.builder()
+    public User toEntity() {
+        return User.builder()
                 .name(name)
                 .email(email)
                 .picture(picture)
