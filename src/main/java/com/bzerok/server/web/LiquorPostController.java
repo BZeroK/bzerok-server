@@ -28,7 +28,10 @@ public class LiquorPostController {
     @PostMapping("/api/v1/liquor")
     public String save(HttpServletResponse response, @RequestBody LiquorSaveRequestDto requestDto) throws JsonProcessingException {
         Long userId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
-        Map<String, Object> jsonData = new HashMap<String, Object>();
+        Map<String, Object> jsonData = new HashMap<>();
+
+        logger.debug(">> User ID :: {}", userId);
+        logger.debug(">> {}", SecurityContextHolder.getContext().getAuthentication());
 
         Long result = liquorPostService.save(userId, requestDto);
 

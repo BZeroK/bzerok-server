@@ -1,7 +1,10 @@
 package com.bzerok.server.web;
 
+import java.util.Collections;
 import java.util.List;
 
+import com.bzerok.server.config.security.jwt.JwtFilter;
+import com.bzerok.server.config.security.jwt.TokenProvider;
 import com.bzerok.server.domain.liquor.Liquor;
 import com.bzerok.server.domain.liquor.LiquorRepository;
 import com.bzerok.server.web.dto.LiquorSaveRequestDto;
@@ -15,6 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,11 +28,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WithMockUser(roles="USER")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LiquorPostControllerTest {
 
@@ -39,13 +45,21 @@ public class LiquorPostControllerTest {
     @Autowired
     private LiquorRepository liquorRepository;
 
+    @Autowired
+    private TokenProvider tokenProvider;
+
     private MockMvc mvc;
 
     @Before
     public void setup() {
         mvc = MockMvcBuilders
                 .webAppContextSetup(context)
+                .apply(springSecurity())
+                .addFilters(new JwtFilter(tokenProvider))
                 .build();
+
+        SecurityContextHolder.getContext()
+                .setAuthentication(new UsernamePasswordAuthenticationToken("1", "password", Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
     }
 
     @After
@@ -54,6 +68,7 @@ public class LiquorPostControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     public void postLiquorPost() throws Exception {
         // given
         Long userId = 1L;
@@ -98,6 +113,7 @@ public class LiquorPostControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     public void updateLiquorPost() throws Exception {
         // given
         Liquor savedLiquorPost = liquorRepository.save(Liquor.builder()
@@ -127,8 +143,7 @@ public class LiquorPostControllerTest {
         // when
         mvc.perform(put(url)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(new ObjectMapper().writeValueAsString(requestDto))
-                .sessionAttr("userId", 1L))
+                .content(new ObjectMapper().writeValueAsString(requestDto)))
                 .andExpect(status().isOk());
 
         // then
