@@ -49,6 +49,7 @@ public class LiquorPostControllerTest {
     private TokenProvider tokenProvider;
 
     private MockMvc mvc;
+    private final Long USER_ID = 1L;
 
     @Before
     public void setup() {
@@ -59,7 +60,7 @@ public class LiquorPostControllerTest {
                 .build();
 
         SecurityContextHolder.getContext()
-                .setAuthentication(new UsernamePasswordAuthenticationToken("1", "password", Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
+                .setAuthentication(new UsernamePasswordAuthenticationToken(USER_ID, "password", Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))));
     }
 
     @After
@@ -71,7 +72,7 @@ public class LiquorPostControllerTest {
     @WithMockUser(roles = "USER")
     public void postLiquorPost() throws Exception {
         // given
-        Long userId = 1L;
+        Long userId = USER_ID;
         String name = "name";
         Integer category = 1;
         Integer volume = 750;
@@ -117,7 +118,7 @@ public class LiquorPostControllerTest {
     public void updateLiquorPost() throws Exception {
         // given
         Liquor savedLiquorPost = liquorRepository.save(Liquor.builder()
-                .userId(1L)
+                .userId(USER_ID)
                 .name("name")
                 .category(1)
                 .volume(750)
