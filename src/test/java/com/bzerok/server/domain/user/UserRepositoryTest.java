@@ -58,9 +58,9 @@ public class UserRepositoryTest {
         Role role = Role.USER;
 
         String expectedName = "김길동";
-        String expectedEmail = "update@update.com";
+        String expectedPicture = "updated picture";
 
-        User savedUser = userRepository.save(User.builder()
+        User user = userRepository.save(User.builder()
                 .name(name)
                 .email(email)
                 .picture(picture)
@@ -68,12 +68,12 @@ public class UserRepositoryTest {
                 .build());
 
         // When
-        User user = savedUser.update(expectedName, expectedEmail);
+        user.update(expectedName, expectedPicture);
 
         // Then
         assertThat(user.getName()).isEqualTo(expectedName);
-        assertThat(user.getEmail()).isEqualTo(expectedEmail);
-        assertThat(user.getPicture()).isEqualTo(picture);
+        assertThat(user.getEmail()).isEqualTo(email);
+        assertThat(user.getPicture()).isEqualTo(expectedPicture);
         assertThat(user.getRole()).isEqualTo(role);
     }
 

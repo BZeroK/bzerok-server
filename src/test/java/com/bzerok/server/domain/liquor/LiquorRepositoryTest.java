@@ -74,7 +74,7 @@ public class LiquorRepositoryTest {
         String picture = "picture";
         String etc = "etc";
 
-        Liquor savedLiquorPost = liquorRepository.save(Liquor.builder()
+        Liquor liquor = liquorRepository.save(Liquor.builder()
                 .userId(userId)
                 .name(name)
                 .category(category)
@@ -90,18 +90,18 @@ public class LiquorRepositoryTest {
         Integer expectedCategory = 2;
         String expectedEtc = "updated etc";
 
-        savedLiquorPost.update(expectedName, expectedCategory, volume, price, rate, picture, expectedEtc);
+        liquor.update(expectedName, expectedCategory, volume, price, rate, picture, expectedEtc);
 
         // Then
-        assertThat(savedLiquorPost).isNotNull();
-        assertThat(savedLiquorPost.getUserId()).isEqualTo(userId);
-        assertThat(savedLiquorPost.getName()).isEqualTo(expectedName);
-        assertThat(savedLiquorPost.getCategory()).isEqualTo(expectedCategory);
-        assertThat(savedLiquorPost.getVolume()).isEqualTo(volume);
-        assertThat(savedLiquorPost.getPrice()).isEqualTo(price);
-        assertThat(savedLiquorPost.getRate()).isEqualTo(rate);
-        assertThat(savedLiquorPost.getPicture()).isEqualTo(picture);
-        assertThat(savedLiquorPost.getEtc()).isEqualTo(expectedEtc);
+        assertThat(liquor).isNotNull();
+        assertThat(liquor.getUserId()).isEqualTo(userId);
+        assertThat(liquor.getName()).isEqualTo(expectedName);
+        assertThat(liquor.getCategory()).isEqualTo(expectedCategory);
+        assertThat(liquor.getVolume()).isEqualTo(volume);
+        assertThat(liquor.getPrice()).isEqualTo(price);
+        assertThat(liquor.getRate()).isEqualTo(rate);
+        assertThat(liquor.getPicture()).isEqualTo(picture);
+        assertThat(liquor.getEtc()).isEqualTo(expectedEtc);
     }
 
     @Test
