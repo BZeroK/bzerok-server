@@ -8,8 +8,10 @@ import com.bzerok.server.config.security.oauth2.CustomOAuth2UserService;
 import com.bzerok.server.config.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.bzerok.server.config.security.oauth2.OAuth2AuthenticationFailureHandler;
 import com.bzerok.server.config.security.oauth2.OAuth2AuthenticationSuccessHandler;
+import com.bzerok.server.config.security.oauth2.OAuth2LogoutSuccessHandler;
 import com.bzerok.server.domain.user.Role;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -20,10 +22,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    @Value("${app.cookie.jwtTokenName}")
+    private String JWT_TOKEN_NAME;
+
     private final CustomOAuth2UserService customOAuth2UserService;
     private final HttpCookieOAuth2AuthorizationRequestRepository cookieOAuth2AuthorizationRequestRepository;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+    private final OAuth2LogoutSuccessHandler oAuth2LogoutSuccessHandler;
     private final TokenProvider tokenProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
@@ -80,7 +86,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                     .logoutUrl("/api/v1/oauth2/logout")
-                    .deleteCookies("bzerok_token")
+                    .logoutSuccessHandler(oAuth2LogoutSuccessHandler)
+                    .deleteCookies(JWT_TOKEN_NAME)
                     .permitAll();
 
         http.addFilterBefore(new JwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
