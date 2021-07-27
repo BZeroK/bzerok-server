@@ -97,8 +97,7 @@ public class LiquorPostControllerTest {
         // when
         mvc.perform(post(url)
             .contentType(MediaType.APPLICATION_JSON_UTF8)
-            .content(new ObjectMapper().writeValueAsString(requestDto))
-            .sessionAttr("userId", 1L))
+            .content(new ObjectMapper().writeValueAsString(requestDto)))
             .andExpect(status().isOk());
 
         // then
