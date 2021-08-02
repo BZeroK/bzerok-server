@@ -6,8 +6,8 @@ import javax.servlet.http.HttpSession;
 
 import com.bzerok.server.config.security.oauth2.dto.OAuthAttributes;
 import com.bzerok.server.config.security.oauth2.dto.SessionUser;
-import com.bzerok.server.domain.users.Users;
-import com.bzerok.server.domain.users.UsersRepository;
+import com.bzerok.server.domain.user.User;
+import com.bzerok.server.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     @Value("${app.session.attributes.user}")
     private String SESSION_USER;
 
-    private final UsersRepository usersRepository;
+    private final UserRepository userRepository;
     private final HttpSession httpSession;
     private final Logger logger = LoggerFactory.getLogger(CustomOAuth2UserService.class);
 
@@ -41,20 +41,20 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
         OAuthAttributes attributes = OAuthAttributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
-        Users user = saveOrUpdate(attributes);
+        User user = saveOrUpdate(attributes);
         httpSession.setAttribute(SESSION_USER, new SessionUser(user));
 
         return new DefaultOAuth2User(Collections.singleton(new SimpleGrantedAuthority(user.getRoleKey())), attributes.getAttributes(), attributes.getNameAttributeKey());
     }
 
-    public Users saveOrUpdate(OAuthAttributes attributes) {
-        Users user = usersRepository.findByEmail(attributes.getEmail())
+    public User saveOrUpdate(OAuthAttributes attributes) {
+        User user = userRepository.findByEmail(attributes.getEmail())
                 .map(entity -> entity.update(attributes.getName(), attributes.getPicture()))
                 .orElse(attributes.toEntity());
 
         logger.debug(">> user attributes - email :: {}", attributes.getEmail());
 
-        return usersRepository.save(user);
+        return userRepository.save(user);
     }
 
 }

@@ -2,8 +2,8 @@ package com.bzerok.server.config.security.oauth2.dto;
 
 import java.util.Map;
 
-import com.bzerok.server.domain.users.Role;
-import com.bzerok.server.domain.users.Users;
+import com.bzerok.server.domain.user.Role;
+import com.bzerok.server.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -27,6 +27,14 @@ public class OAuthAttributes {
 
     public static OAuthAttributes of(String registrationId, String userNameAttributeName, Map<String, Object> attributes) {
         return ofGoogle(userNameAttributeName, attributes);
+
+        // TODO
+//        else if (registrationId.equals("kakao")) {
+//            return ofKakao(userNameAttributeName, attributes);
+//        }
+//        else if (registrationId.equals("naver")) {
+//            return ofNaver(userNameAttributeName, attributes);
+//        }
     }
 
     public static OAuthAttributes ofGoogle(String userNameAttributeName, Map<String, Object> attributes) {
@@ -39,12 +47,20 @@ public class OAuthAttributes {
             .build();
     }
 
-    public Users toEntity() {
-        return Users.builder()
+//    public static OAuthAttributes ofKakao(String userNameAttributeName, Map<String, Object> attributes) {
+//        // TODO
+//    }
+//
+//    public static OAuthAttributes ofNaver(String userNameAttributeName, Map<String, Object> attributes) {
+//        // TODO
+//    }
+
+    public User toEntity() {
+        return User.builder()
                 .name(name)
                 .email(email)
                 .picture(picture)
-                .role(Role.GUEST)
+                .role(Role.USER)
                 .build();
     }
 

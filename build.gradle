@@ -22,6 +22,7 @@ sourceCompatibility = 1.8
 
 configurations {
     all {
+        // log4j2
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
     }
 }
@@ -32,23 +33,45 @@ repositories {
 }
 
 dependencies {
+
     compile('org.springframework.boot:spring-boot-starter-web')
+
+    // JPA
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
+
+    // OAuth2
     compile('org.springframework.boot:spring-boot-starter-oauth2-client')
-    compile('org.springframework.boot:spring-boot-starter-log4j2')
+
+    // DB에 Session 저장
     compile('org.springframework.session:spring-session-jdbc')
+
+    // lombok
     compile('org.projectlombok:lombok')
-    compile('com.h2database:h2')
-    compile('mysql:mysql-connector-java')
-    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.2'
-    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.10.3'
-    compile('io.jsonwebtoken:jjwt-api:0.11.2')
-
     annotationProcessor('org.projectlombok:lombok')
+    testAnnotationProcessor('org.projectlombok:lombok')
 
+    // h2
+    compile('com.h2database:h2')
+
+    // MySQL
+    compile('mysql:mysql-connector-java')
+
+    // JWT
+    compile('io.jsonwebtoken:jjwt-api:0.11.2')
     runtime('io.jsonwebtoken:jjwt-impl:0.11.2')
     runtime('io.jsonwebtoken:jjwt-jackson:0.11.2')
 
+    // Jackson
+    compile('com.fasterxml.jackson.core:jackson-databind:2.12.4')
+    compile('com.fasterxml.jackson.core:jackson-core:2.12.4')
+    compile('com.fasterxml.jackson.core:jackson-annotations:2.12.4')
+
+    // log4j2
+    compile('org.springframework.boot:spring-boot-starter-log4j2')
+    compile('com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.10.3')
+
+    // Test
     testCompile('org.springframework.boot:spring-boot-starter-test')
-    testAnnotationProcessor('org.projectlombok:lombok')
+    testCompile('org.springframework.security:spring-security-test')
+
 }

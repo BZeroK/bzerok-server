@@ -1,14 +1,13 @@
 package com.bzerok.server.config.security.jwt;
 
 import java.security.Key;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import javax.servlet.http.HttpSession;
-
-import com.bzerok.server.config.security.oauth2.dto.SessionUser;
+import com.bzerok.server.domain.user.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -37,10 +36,7 @@ public class TokenProvider implements InitializingBean {
     private String secret;
     @Value("${jwt.expiration}")
     private long expiration;
-    @Value("${app.session.attributes.user}")
-    private String SESSION_USER;
 
-    private final HttpSession httpSession;
     private final Logger logger = LoggerFactory.getLogger(TokenProvider.class);
     private Key key;
 
@@ -50,30 +46,18 @@ public class TokenProvider implements InitializingBean {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String createToken(Authentication authentication) {
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute(SESSION_USER);
-        Long userId = sessionUser.getUserId();
-
-        logger.info(">> authentication :: {}", authentication);
-        logger.info(">> authorities :: {}", authorities);
-
+    public String createToken(Long userId, Role role) {
         long now = (new Date()).getTime();
         Date validity = new Date(now + expiration);
 
-        logger.debug(">> JWT Info");
-        logger.debug("   -> subject = {}", authentication.getName());
-        logger.debug("   -> authorities = {}", authorities);
-        logger.debug("   -> key = {}", key);
-        logger.debug("   -> expiration = {}", validity);
+        Map<String, String> claims = new HashMap<String, String>();
+        claims.put("userId", String.valueOf(userId));
+        claims.put("role", role.getKey());
 
         return Jwts.builder()
-                .setSubject(authentication.getName())
+                .setIssuer("bzerok-server")
+                .setClaims(claims)
                 .setExpiration(validity)
-                .claim("role", authorities)
-                .claim("user_id", userId)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
@@ -86,12 +70,10 @@ public class TokenProvider implements InitializingBean {
                 .parseClaimsJws(token)
                 .getBody();
 
-        Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get("role").toString().split(","))
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(claims.get("role").toString()));
 
-        User principal = new User(claims.getSubject(), "", authorities);
+        User principal = new User(claims.get("userId").toString(), "", authorities);
 
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }

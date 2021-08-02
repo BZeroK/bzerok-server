@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.bzerok.server.config.security.jwt.TokenProvider;
+import com.bzerok.server.config.security.oauth2.dto.SessionUser;
 import com.bzerok.server.utils.CookieUtils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -32,7 +33,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private String JWT_TOKEN_NAME;
     @Value("${app.cookie.redirectUriName}")
     private String REDIRECT_URI_COOKIE_NAME;
+    @Value("${app.session.attributes.user}")
+    private String SESSION_USER;
 
+    private final HttpSession httpSession;
     private final TokenProvider tokenProvider;
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
     private static final Logger logger = LoggerFactory.getLogger(OAuth2AuthenticationSuccessHandler.class);
@@ -40,6 +44,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         String targetUrl = determineTargetUrl(request, response, authentication);
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute(SESSION_USER);
 
         if (response.isCommitted()) {
             logger.info(">> Response has already been committed. Unable to redirect to " + targetUrl);
@@ -48,8 +53,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         clearAuthenticationAttributes(request, response);
 
-        String token = tokenProvider.createToken(authentication);
+        String token = tokenProvider.createToken(sessionUser.getUserId(), sessionUser.getRole());
         CookieUtils.addCookie(response, JWT_TOKEN_NAME, token, 846000);
+        httpSession.removeAttribute(SESSION_USER);
 
         logger.debug(">> Redirect URI :: {}", targetUrl);
 

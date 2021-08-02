@@ -1,4 +1,4 @@
-package com.bzerok.server.domain.users;
+package com.bzerok.server.domain.user;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Entity
-public class Users extends BaseTimeEntity {
+public class User extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,14 +36,14 @@ public class Users extends BaseTimeEntity {
     private Role role;
 
     @Builder
-    public Users (String email, String name, String picture, Role role) {
+    public User(String email, String name, String picture, Role role) {
         this.email = email;
         this.name = name;
         this.picture = picture;
         this.role = role;
     }
 
-    public Users update(String name, String picture) {
+    public User update(String name, String picture) {
         this.name = name;
         this.picture = picture;
 

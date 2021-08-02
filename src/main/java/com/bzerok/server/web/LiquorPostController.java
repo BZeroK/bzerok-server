@@ -1,130 +1,99 @@
 package com.bzerok.server.web;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import com.bzerok.server.config.security.oauth2.dto.SessionUser;
 import com.bzerok.server.service.liquor.LiquorPostService;
 import com.bzerok.server.web.dto.LiquorResponseDto;
 import com.bzerok.server.web.dto.LiquorSaveRequestDto;
 import com.bzerok.server.web.dto.LiquorUpdateRequestDto;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
 public class LiquorPostController {
 
-    @Value("${app.session.attributes.user}")
-    private String SESSION_USER;
-
     private final LiquorPostService liquorPostService;
-    private final HttpSession httpSession;
     private final static Logger logger = LoggerFactory.getLogger(LiquorPostController.class);
 
     @PostMapping("/api/v1/liquor")
-    public String save(HttpServletResponse response, @RequestBody LiquorSaveRequestDto requestDto) {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute(SESSION_USER);
-        JsonObject jsonObject = new JsonObject();
+    public String save(HttpServletResponse response, @RequestBody LiquorSaveRequestDto requestDto) throws JsonProcessingException {
+        Long userId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
+        Map<String, Object> jsonData = new HashMap<>();
 
-        if (sessionUser == null) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            jsonObject.addProperty("message", "사용 권한이 없습니다. 다시 로그인하세요.");
+        logger.debug(">> User ID :: {}", userId);
+        logger.debug(">> {}", SecurityContextHolder.getContext().getAuthentication());
+
+        Long result = liquorPostService.save(userId, requestDto);
+
+        if (result != null) {
+            jsonData.put("code", 200);
+            jsonData.put("message", "등록 성공");
         }
-
         else {
-            Long userId = sessionUser.getUserId();
-            Long result = liquorPostService.save(userId, requestDto);
-
-            if (result != null) {
-                jsonObject.addProperty("code", 200);
-                jsonObject.addProperty("message", "등록 성공");
-                jsonObject.addProperty("data", "");
-            }
-            else {
-                jsonObject.addProperty("code", 500);
-                jsonObject.addProperty("message", "등록 실패");
-                jsonObject.addProperty("data", "");
-            }
+            jsonData.put("code", 500);
+            jsonData.put("message", "등록 실패");
         }
 
-        return jsonObject.toString();
+        return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(jsonData);
     }
 
     @PutMapping("/api/v1/liquor/{liquorPostId}")
-    public String update(@PathVariable Long liquorPostId, @RequestBody LiquorUpdateRequestDto requestDto) {
+    public String update(@PathVariable Long liquorPostId, @RequestBody LiquorUpdateRequestDto requestDto) throws JsonProcessingException {
         Long result = liquorPostService.update(liquorPostId, requestDto);
-        JsonObject response = new JsonObject();
+        Map<String, Object> jsonData = new HashMap<String, Object>();
 
         if (result != null) {
-            response.addProperty("code", 200);
-            response.addProperty("message", "수정 성공");
-            response.addProperty("data", "");
+            jsonData.put("code", 200);
+            jsonData.put("message", "수정 성공");
         }
         else {
-            response.addProperty("code", 500);
-            response.addProperty("message", "수정 실패");
-            response.addProperty("data", "");
+            jsonData.put("code", 500);
+            jsonData.put("message", "수정 실패");
         }
 
-        return response.toString();
+        return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(jsonData);
     }
 
     @DeleteMapping("/api/v1/liquor/{liquorPostId}")
-    public String delete(@PathVariable Long liquorPostId) {
+    public String delete(@PathVariable Long liquorPostId) throws JsonProcessingException {
+        Map<String, Object> jsonData = new HashMap<String, Object>();
+
         liquorPostService.delete(liquorPostId);
-        JsonObject response = new JsonObject();
 
-        response.addProperty("code", 200);
-        response.addProperty("message", "삭제 성공");
-        response.addProperty("data", "");
+        jsonData.put("code", 200);
+        jsonData.put("message", "삭제 성공");
 
-        return response.toString();
+        return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(jsonData);
     }
 
     @GetMapping("/api/v1/liquor")
-    public String findById() {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute(SESSION_USER);
-        Long userId = sessionUser.getUserId();
+    public String findById() throws JsonProcessingException {
+        Long userId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
         List<LiquorResponseDto> results = liquorPostService.findByUserId(userId);
-        JsonObject response = new JsonObject();
-        JsonArray data = new JsonArray();
+        Map<String, Object> jsonData = new HashMap<String, Object>();
 
         if (results != null) {
-            for (LiquorResponseDto result : results) {
-                JsonObject temp = new JsonObject();
-                temp.addProperty("liquorPostId", result.getLiquorPostId());
-                temp.addProperty("userId", result.getUserId());
-                temp.addProperty("name", result.getName());
-                temp.addProperty("category", result.getCategory());
-                temp.addProperty("volume", result.getVolume());
-                temp.addProperty("price", result.getPrice());
-                temp.addProperty("rate", result.getRate());
-                temp.addProperty("picture", result.getPicture());
-                temp.addProperty("etc", result.getEtc());
-
-                data.add(temp);
-            }
-
-            response.addProperty("code", 200);
-            response.addProperty("message", "조회 성공");
-            response.add("data", data);
+            jsonData.put("code", 200);
+            jsonData.put("message", "조회 성공");
+            jsonData.put("data", results);
         }
         else {
-            response.addProperty("code", 500);
-            response.addProperty("message", "해당 사용자의 게시물이 존재하지 않습니다. userId=" + userId);
-            response.addProperty("data", "");
+            jsonData.put("code", 500);
+            jsonData.put("message", "해당 사용자의 게시물이 존재하지 않습니다. userId=" + userId);
+            jsonData.put("data", "");
         }
 
-        return response.toString();
+        return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(jsonData);
     }
-
 
 }
