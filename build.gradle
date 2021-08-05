@@ -50,6 +50,9 @@ dependencies {
     annotationProcessor('org.projectlombok:lombok')
     testAnnotationProcessor('org.projectlombok:lombok')
 
+    // Redis
+    compile('org.springframework.boot:spring-boot-starter-data-redis')
+
     // h2
     compile('com.h2database:h2')
 
