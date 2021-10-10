@@ -6,7 +6,7 @@
 bzerok-server
   ├─ gradle
   ├─ src
-	│   ├─ main
+  │   ├─ main
   │   │   ├─ java
   │   │   │   └─ com.bzerok.server
   │   │   │       ├─ config
@@ -23,7 +23,7 @@ bzerok-server
   │   │   │       │   └─ user
   │   │   │       └─ web
   │   │   │           ├─ dto
-	│   │   │           └─ LiquorPostController.java
+  │   │   │           └─ LiquorPostController.java
   │   │   └─ resources
   │   │       ├─ application.yml
   │   │       └─ log4j2.yml
