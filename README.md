@@ -4,9 +4,9 @@
 
 ```
 bzerok-server
-	├─ gradle
-	├─ src
-	│   ├─ main
+  ├─ gradle
+  ├─ src
+  │   ├─ main
   │   │   ├─ java
   │   │   │   └─ com.bzerok.server
   │   │   │       ├─ config
@@ -23,7 +23,7 @@ bzerok-server
   │   │   │       │   └─ user
   │   │   │       └─ web
   │   │   │           ├─ dto
-	│   │   │           └─ [LiquorPostController.java](https://www.notion.so/LiquorPostController-6fd744069c464f149d419fba25f3bbaf)
+  │   │   │           └─ [LiquorPostController.java](https://www.notion.so/LiquorPostController-6fd744069c464f149d419fba25f3bbaf)
   │   │   └─ resources
   │   │       ├─ [application.yml](https://www.notion.so/application-yml-baf8a0359ba847df976bf5378255419b)
   │   │       └─ log4j2.yml
@@ -38,11 +38,11 @@ bzerok-server
   │       │       └─ web
   │       │           └─ LiquorPostControllerTest.java
   │       └─ resources
-	├─ .gitignore
-	├─ build.gradle
-	├─ gradlew
-	├─ gradlew.bat
-	└─ settings.gradle
+  ├─ .gitignore
+  ├─ build.gradle
+  ├─ gradlew
+  ├─ gradlew.bat
+  └─ settings.gradle
 ```
 
 ## Project Specification
