@@ -6,15 +6,15 @@
 bzerok-server
   ├─ gradle
   ├─ src
-  │   ├─ main
+	│   ├─ main
   │   │   ├─ java
   │   │   │   └─ com.bzerok.server
   │   │   │       ├─ config
   │   │   │       │   ├─ security
-  │   │   │       │   │   ├─ [jwt](https://www.notion.so/JWT-e7ca0119d139497e8aed3beef243ca40)
-  │   │   │       │   │   ├─ [oauth2](https://www.notion.so/OAuth-2-0-d092623e5dd4449f9ef3506a56ad17b4)
-  │   │   │       │   │   └─ [SecurityConfig.java](https://www.notion.so/SecurityConfig-java-a601bfcbe62f4128adb6b80064a5d62c)
-  │   │   │       │   └─ [WebConfig.java](https://www.notion.so/WebConfig-java-5d3edcc031ee401e93c65c594f4c7bac)
+  │   │   │       │   │   ├─ jwt
+  │   │   │       │   │   ├─ oauth2
+  │   │   │       │   │   └─ SecurityConfig.java
+  │   │   │       │   └─ WebConfig.java
   │   │   │       ├─ domain
   │   │   │       │   ├─ liquor
   │   │   │       │   └─ user
@@ -23,11 +23,11 @@ bzerok-server
   │   │   │       │   └─ user
   │   │   │       └─ web
   │   │   │           ├─ dto
-  │   │   │           └─ [LiquorPostController.java](https://www.notion.so/LiquorPostController-6fd744069c464f149d419fba25f3bbaf)
+	│   │   │           └─ LiquorPostController.java
   │   │   └─ resources
-  │   │       ├─ [application.yml](https://www.notion.so/application-yml-baf8a0359ba847df976bf5378255419b)
+  │   │       ├─ application.yml
   │   │       └─ log4j2.yml
-  │   └─ [test](https://www.notion.so/Test-76fcf321712c4a86a58c5d1f89cb00a5)
+  │   └─ test
   │       ├─ java
   │       │   └─ com.bzerok.server
   │       │       ├─ domain
