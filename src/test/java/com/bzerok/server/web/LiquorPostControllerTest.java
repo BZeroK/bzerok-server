@@ -96,9 +96,9 @@ public class LiquorPostControllerTest {
 
         // when
         mvc.perform(post(url)
-            .contentType(MediaType.APPLICATION_JSON_UTF8)
-            .content(new ObjectMapper().writeValueAsString(requestDto)))
-            .andExpect(status().isOk());
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(new ObjectMapper().writeValueAsString(requestDto)))
+                .andExpect(status().isOk());
 
         // then
         List<Liquor> all = liquorRepository.findAll();
@@ -152,5 +152,4 @@ public class LiquorPostControllerTest {
         assertThat(all.get(0).getCategory()).isEqualTo(expectedCategory);
         assertThat(all.get(0).getEtc()).isEqualTo(expectedEtc);
     }
-
 }

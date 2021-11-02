@@ -18,31 +18,21 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-@RequiredArgsConstructor
-@RestController
+@RequiredArgsConstructor // final이 포한된 생성자를 생성합니다
+@RestController // Json 형태로 객체 데이터를 반환하기 위한 Annotation
 public class LiquorPostController {
 
     private final LiquorPostService liquorPostService;
     private final static Logger logger = LoggerFactory.getLogger(LiquorPostController.class);
 
     @PostMapping("/api/v1/liquor")
-    public String save(HttpServletResponse response, @RequestBody LiquorSaveRequestDto requestDto) throws JsonProcessingException {
+    public String save(@RequestBody LiquorSaveRequestDto requestDto) throws JsonProcessingException {
         Long userId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
-        Map<String, Object> jsonData = new HashMap<>();
-
-        logger.debug(">> User ID :: {}", userId);
-        logger.debug(">> {}", SecurityContextHolder.getContext().getAuthentication());
-
         Long result = liquorPostService.save(userId, requestDto);
 
-        if (result != null) {
-            jsonData.put("code", 200);
-            jsonData.put("message", "등록 성공");
-        }
-        else {
-            jsonData.put("code", 500);
-            jsonData.put("message", "등록 실패");
-        }
+        Map<String, Object> jsonData = new HashMap<>();
+        jsonData.put("code", result != null ? 200 : 500);
+        jsonData.put("message", result != null ? "등록 성공" : "등록 실패");
 
         return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(jsonData);
     }
@@ -50,26 +40,19 @@ public class LiquorPostController {
     @PutMapping("/api/v1/liquor/{liquorPostId}")
     public String update(@PathVariable Long liquorPostId, @RequestBody LiquorUpdateRequestDto requestDto) throws JsonProcessingException {
         Long result = liquorPostService.update(liquorPostId, requestDto);
-        Map<String, Object> jsonData = new HashMap<String, Object>();
 
-        if (result != null) {
-            jsonData.put("code", 200);
-            jsonData.put("message", "수정 성공");
-        }
-        else {
-            jsonData.put("code", 500);
-            jsonData.put("message", "수정 실패");
-        }
+        Map<String, Object> jsonData = new HashMap<>();
+        jsonData.put("code", result != null ? 200 : 500);
+        jsonData.put("message", result != null ? "수정 성공" : "수정 실패");
 
         return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(jsonData);
     }
 
     @DeleteMapping("/api/v1/liquor/{liquorPostId}")
     public String delete(@PathVariable Long liquorPostId) throws JsonProcessingException {
-        Map<String, Object> jsonData = new HashMap<String, Object>();
-
         liquorPostService.delete(liquorPostId);
 
+        Map<String, Object> jsonData = new HashMap<>();
         jsonData.put("code", 200);
         jsonData.put("message", "삭제 성공");
 
@@ -80,18 +63,11 @@ public class LiquorPostController {
     public String findById() throws JsonProcessingException {
         Long userId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
         List<LiquorResponseDto> results = liquorPostService.findByUserId(userId);
-        Map<String, Object> jsonData = new HashMap<String, Object>();
 
-        if (results != null) {
-            jsonData.put("code", 200);
-            jsonData.put("message", "조회 성공");
-            jsonData.put("data", results);
-        }
-        else {
-            jsonData.put("code", 500);
-            jsonData.put("message", "해당 사용자의 게시물이 존재하지 않습니다. userId=" + userId);
-            jsonData.put("data", "");
-        }
+        Map<String, Object> jsonData = new HashMap<>();
+        jsonData.put("code", 200);
+        jsonData.put("message", results != null ? "조회 성공" : "해당 사용자의 게시물이 존재하지 않습니다. userId=" + userId);
+        jsonData.put("data", results != null ? results : "");
 
         return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(jsonData);
     }

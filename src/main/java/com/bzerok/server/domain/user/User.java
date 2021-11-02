@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import com.bzerok.server.domain.BaseTimeEntity;
+import io.jsonwebtoken.lang.Assert;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,6 +38,10 @@ public class User extends BaseTimeEntity {
 
     @Builder
     public User(String email, String name, String picture, Role role) {
+        Assert.notNull(email, "Email must not be null");
+        Assert.notNull(name, "Name must not be null");
+        Assert.notNull(role, "Role must not be null");
+
         this.email = email;
         this.name = name;
         this.picture = picture;
@@ -44,6 +49,8 @@ public class User extends BaseTimeEntity {
     }
 
     public User update(String name, String picture) {
+        Assert.notNull(name, "Name must not be null");
+
         this.name = name;
         this.picture = picture;
 
